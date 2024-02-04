@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: rgb(197, 238, 238);
+            
+        }
+
+        h1{
+           color: blue;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+           
+        }
+        th, td {
+            border: 1px solid #110202;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f0f0;
+        }
+        .total {
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 70px;
+        }
+        @media (max-width: 600px) {
+            th, td {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Lista de Compras</h1>
+    <form id="itemForm">
+        <input type="text" id="itemName" placeholder="Nome do Item" required>
+        <button type="submit">Adicionar</button>
+    </form>
+    
+    <table id="shoppingList">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantidade</th>
+                <th>Preço Unitário (R$)</th>
+                <th>Subtotal (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Itens adicionados aparecerão aqui -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="total">Total:</td>
+                <td id="totalExpense">0,00</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const itemName = document.getElementById('itemName').value;
+            if (!itemName) return;
+
+            const table = document.getElementById('shoppingList').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
+            
+            cell1.textContent = itemName;
+            cell2.innerHTML = '<input type="number" value="1" min="1" class="quantity" onchange="updateLineTotal(this)">';
+            cell3.innerHTML = '<input type="number" value="0.00" step="0.01" min="0" class="price" onchange="updateLineTotal(this)">';
+            cell4.className = 'line-total';
+            cell4.textContent = '0,00';
+            
+            document.getElementById('itemName').value = ''; // Reset field
+            updateTotalExpense();
+        });
+
+        function updateLineTotal(elem) {
+            const row = elem.parentNode.parentNode;
+            const quantity = row.getElementsByClassName('quantity')[0].value;
+            const price = row.getElementsByClassName('price')[0].value;
+            const lineTotal = row.getElementsByClassName('line-total')[0];
+            
+            const total = (quantity * price).toFixed(2);
+            lineTotal.textContent = total.replace('.', ',');
+
+            updateTotalExpense();
+        }
+
+        function updateTotalExpense() {
+            const lineTotals = document.getElementsByClassName('line-total');
+            let totalExpense = 0;
+
+            Array.from(lineTotals).forEach(function(element) {
+                totalExpense += parseFloat(element.textContent.replace(',', '.') || 0);
+            });
+
+            document.getElementById('totalExpense').textContent = totalExpense.toFixed(2).replace('.', ',');
+        }
+    </script>
+</body>
+</html>
